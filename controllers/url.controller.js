@@ -16,6 +16,24 @@ async function handleUrlGeneration(req,res){
     return res.json({shortId : shortId});
 }
 
+async function handleAnalytics(req,res){
+    const shortId = req.params.shortId;
+    const result = await Url.findOne({shortId});
+
+    if(!result) return res.status(404).json({error : "no url found!!!"});
+
+    const totalClicks = result.visitHistory.length;
+    const lastVisited = totalClicks > 0 ? new Date(result.visitHistory[totalClicks-1].timestamp) : null ;
+
+    return res.json({
+        shortId : result.shortId,
+        clicks : totalClicks,
+        analytics : result.visitHistory,
+        lastVisited,
+    });
+}
+
 module.exports = {
-    handleUrlGeneration
+    handleUrlGeneration,
+    handleAnalytics
 };
